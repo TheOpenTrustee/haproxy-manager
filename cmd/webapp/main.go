@@ -22,7 +22,7 @@ func main() {
 	rootMux.Handle("/app/", http.StripPrefix("/app", appMux))
 
 	appMux.HandleFunc("/login", loginEndpoint)
-	appMux.HandleFunc("/dashboard", protectedHandler("/app/login", dashboardEndpoint))
+	appMux.HandleFunc("/dashboard", protectedHandler(dashboardEndpoint))
 	appMux.Handle("/", http.RedirectHandler("/app/dashboard", http.StatusMovedPermanently))
 
 	f = staticFiles

@@ -21,7 +21,9 @@ import (
 
 var db *sql.DB
 
-var userIDKey = "user_id"
+type AuthContextKey string
+
+var userIDKey AuthContextKey = "user_id"
 
 // User represents a user in the database.
 type User struct {
