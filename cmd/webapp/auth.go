@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,6 +25,8 @@ var db *sql.DB
 type AuthContextKey string
 
 var userIDKey AuthContextKey = "user_id"
+
+var ErrMissingAuthHeader = errors.New("authorization header missing")
 
 // User represents a user in the database.
 type User struct {
@@ -171,11 +174,16 @@ func loginEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProtectedHandler wraps another handler and redirects unauthenticated users.
-func protectedHandler(next http.HandlerFunc) http.HandlerFunc {
+func protectedHandler(loginUrl string, next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Check if the user is authenticated and retrieve the userID
 		isAuth, userID, err := isAuthenticated(r)
 		if !isAuth {
+			if err == ErrMissingAuthHeader {
+				log.Println("missing auth header")
+				http.Redirect(w, r, loginUrl, http.StatusTemporaryRedirect)
+				return
+			}
 			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
 		}
@@ -216,26 +224,18 @@ func comparePassword(storedHash, providedPassword string) bool {
 // isAuthenticated checks if the incoming request has a valid JWT token.
 func isAuthenticated(r *http.Request) (bool, string, error) {
 	// Extract the JWT token from the Authorization header
-	authHeader := r.Header.Get("auth_token")
-	if authHeader == "" {
-		return false, "", errors.New("authorization header missing")
+	authHeader, err := r.Cookie("auth_token")
+	if err != nil {
+		return false, "", ErrMissingAuthHeader
 	}
-
-	// The format of the header should be "Bearer <token>"
-	parts := strings.Split(authHeader, " ")
-	if len(parts) != 2 || parts[0] != "Bearer" {
-		return false, "", errors.New("invalid authorization header format")
-	}
-
-	tokenString := parts[1]
 
 	// Parse and validate the JWT token
-	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(authHeader.Value, func(t *jwt.Token) (interface{}, error) {
 		// Validate the algorithm
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
-		return JWT_SECRET, nil
+		return []byte(JWT_SECRET), nil
 	})
 
 	if err != nil {
@@ -252,13 +252,13 @@ func isAuthenticated(r *http.Request) (bool, string, error) {
 		}
 
 		// Retrieve the user ID or other relevant claim
-		userID, ok := claims["user_id"].(string)
+		userID, ok := claims["user_id"].(float64)
 		if !ok {
 			return false, "", errors.New("user ID not found in token")
 		}
 
 		// Authentication successful
-		return true, userID, nil
+		return true, strconv.Itoa(int(userID)), nil
 	}
 
 	return false, "", errors.New("invalid token")

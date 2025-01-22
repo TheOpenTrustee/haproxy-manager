@@ -35,12 +35,16 @@ type responseWriter struct {
 	http.ResponseWriter
 	statusCode   int
 	bytesWritten int
+	wroteHeader  bool
 }
 
 // WriteHeader captures the status code and writes the header.
 func (rw *responseWriter) WriteHeader(code int) {
-	rw.statusCode = code
-	rw.ResponseWriter.WriteHeader(code)
+	if !rw.wroteHeader {
+		rw.statusCode = code
+		rw.ResponseWriter.WriteHeader(code)
+		rw.wroteHeader = true
+	}
 }
 
 // Write captures the number of bytes written and writes the response.
