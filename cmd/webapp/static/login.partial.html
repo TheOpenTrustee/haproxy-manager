@@ -3,10 +3,10 @@
 <div class="flex-1 m-auto">
     <h1 class="text-xl p-8 flex-1">HAProxy Manager</h1>
     <form class="flex flex-0 flex-row gap-4 w-3/4 form m-auto justify-center text-right" hx-target="this"
-        hx-swap="outerHTML">
+        hx-swap="outerHTML" method="POST">
         <div class="title">Welcome,<br><span>sign in to continue</span></div>
         <div class="flex flex-1 flex-col gap-4 justify-center items-center">
-            <input class="input flex" name="email" placeholder="Email" type="email">
+            <input class="input flex" name="username" placeholder="Email" type="text">
             <input class="input flex" name="password" placeholder="Password" type="password">
             <button class="button-confirm">Let&rsquo;s go →</button>
         </div>

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/fs"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,6 +11,10 @@ import (
 )
 
 var f fs.FS
+var PASSWORD_SALT = "randompasswordsalt"
+var JWT_SECRET = "randomjwtsecret"
+
+const PROD_ENV = "production"
 
 func main() {
 	rootMux := http.NewServeMux()
@@ -21,7 +26,7 @@ func main() {
 	appMux.Handle("/", http.RedirectHandler("/app/dashboard", http.StatusMovedPermanently))
 
 	f = staticFiles
-	if os.Getenv("ENV") != "production" {
+	if os.Getenv("ENV") != PROD_ENV {
 		_, file, _, ok := runtime.Caller(0)
 		if !ok {
 			fmt.Println("unable to get caller info")
@@ -31,8 +36,18 @@ func main() {
 		srcDir := filepath.Dir(file)
 		f = os.DirFS(srcDir)
 	}
+
+	if ps := os.Getenv("HAPROXY_MANAGER_PASSWORD_HASH"); ps != "" {
+		PASSWORD_SALT = ps
+	}
+
+	if ps := os.Getenv("HAPROXY_MANAGER_JWT_SECRET"); ps != "" {
+		JWT_SECRET = ps
+	}
+
 	rootMux.Handle("/static/", http.FileServer(http.FS(f)))
 	rootMux.Handle("/", http.RedirectHandler("/app", http.StatusMovedPermanently))
 
-	http.ListenAndServe(":8080", rootMux)
+	log.Println("Server Starting")
+	http.ListenAndServe(":8080", loggingMiddleware(rootMux))
 }
