@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"database/sql"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -18,6 +20,8 @@ import (
 )
 
 var db *sql.DB
+
+var userIDKey = "user_id"
 
 // User represents a user in the database.
 type User struct {
@@ -165,15 +169,20 @@ func loginEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 // ProtectedHandler wraps another handler and redirects unauthenticated users.
-func protectedHandler(loginPath string, next http.HandlerFunc) http.HandlerFunc {
+func protectedHandler(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !isAuthenticated(r) {
-			// Redirect to the login page if the user is not authenticated.
-			http.Redirect(w, r, loginPath, http.StatusFound)
+		// Check if the user is authenticated and retrieve the userID
+		isAuth, userID, err := isAuthenticated(r)
+		if !isAuth {
+			http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 			return
 		}
+
+		// Store the userID in the context
+		ctx := context.WithValue(r.Context(), userIDKey, userID)
+
 		// Call the next handler if authenticated.
-		next(w, r)
+		next(w, r.WithContext(ctx))
 	}
 }
 
@@ -202,14 +211,55 @@ func comparePassword(storedHash, providedPassword string) bool {
 	return string(computedHash) == string(storedHashBytes)
 }
 
-func isAuthenticated(r *http.Request) bool {
-	// Example check: Look for a "session_token" cookie.
-	cookie, err := r.Cookie("auth_token")
-	if err != nil || cookie.Value == "" {
-		return false
+// isAuthenticated checks if the incoming request has a valid JWT token.
+func isAuthenticated(r *http.Request) (bool, string, error) {
+	// Extract the JWT token from the Authorization header
+	authHeader := r.Header.Get("auth_token")
+	if authHeader == "" {
+		return false, "", errors.New("authorization header missing")
 	}
-	// Additional validation of the session token can be added here.
-	return true
+
+	// The format of the header should be "Bearer <token>"
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return false, "", errors.New("invalid authorization header format")
+	}
+
+	tokenString := parts[1]
+
+	// Parse and validate the JWT token
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		// Validate the algorithm
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return JWT_SECRET, nil
+	})
+
+	if err != nil {
+		return false, "", err
+	}
+
+	// Verify claims (e.g., expiration)
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		// Check the "exp" (expiration) claim
+		if exp, ok := claims["exp"].(float64); ok {
+			if time.Unix(int64(exp), 0).Before(time.Now()) {
+				return false, "", errors.New("token has expired")
+			}
+		}
+
+		// Retrieve the user ID or other relevant claim
+		userID, ok := claims["user_id"].(string)
+		if !ok {
+			return false, "", errors.New("user ID not found in token")
+		}
+
+		// Authentication successful
+		return true, userID, nil
+	}
+
+	return false, "", errors.New("invalid token")
 }
 
 func hashNewPassword(password string) (string, error) {
