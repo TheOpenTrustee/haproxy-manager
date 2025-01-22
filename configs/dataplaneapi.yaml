@@ -1,0 +1,7 @@
+dataplaneapi:
+  advertised:
+    api_address: "0.0.0.0"
+    api_port: 5555
+haproxy:
+  reload:
+    reload_strategy: custom

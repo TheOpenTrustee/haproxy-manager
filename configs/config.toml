@@ -1,0 +1,7 @@
+[processes.haproxy]
+command = "haproxy -f /usr/local/etc/haproxy/haproxy.cfg"
+shell = "/bin/ash"
+
+[processes.haproxy_dataplane]
+command = "./dataplane.sh"
+shell = "/bin/ash"
