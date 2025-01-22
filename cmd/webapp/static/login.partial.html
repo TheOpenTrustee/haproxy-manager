@@ -1,11 +1,15 @@
 <!-- From Uiverse.io by ayyjayy2 -->
 {{ define "content" }}
-<div class="flex flex-1 m-auto">
-    <form class="form" hx-target="this" hx-swap="outerHTML">
+<div class="flex-1 m-auto">
+    <h1 class="text-xl p-8 flex-1">HAProxy Manager</h1>
+    <form class="flex flex-0 flex-row gap-4 w-3/4 form m-auto justify-center text-right" hx-target="this"
+        hx-swap="outerHTML">
         <div class="title">Welcome,<br><span>sign in to continue</span></div>
-        <input class="input" name="email" placeholder="Email" type="email">
-        <input class="input" name="password" placeholder="Password" type="password">
-        <button class="button-confirm">Let&rsquo;s go →</button>
+        <div class="flex flex-1 flex-col gap-4 justify-center items-center">
+            <input class="input flex" name="email" placeholder="Email" type="email">
+            <input class="input flex" name="password" placeholder="Password" type="password">
+            <button class="button-confirm">Let&rsquo;s go →</button>
+        </div>
     </form>
 </div>
 <style>
@@ -18,11 +22,6 @@
         --main-color: black;
         padding: 20px;
         background: lightblue;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: center;
-        gap: 20px;
         border-radius: 5px;
         border: 2px solid var(--main-color);
         box-shadow: 4px 4px var(--main-color);

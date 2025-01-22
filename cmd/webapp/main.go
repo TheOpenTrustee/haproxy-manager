@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
 )
 
 var f fs.FS
@@ -12,7 +15,6 @@ func main() {
 	rootMux := http.NewServeMux()
 	appMux := http.NewServeMux()
 	rootMux.Handle("/app/", http.StripPrefix("/app", appMux))
-	rootMux.Handle("/", http.RedirectHandler("/app", http.StatusMovedPermanently))
 
 	appMux.HandleFunc("/login", loginEndpoint)
 	appMux.HandleFunc("/dashboard", protectedHandler("/app/login", dashboardEndpoint))
@@ -20,8 +22,17 @@ func main() {
 
 	f = staticFiles
 	if os.Getenv("ENV") != "production" {
-		f = os.DirFS(".") // TODO fix this
-	}
+		_, file, _, ok := runtime.Caller(0)
+		if !ok {
+			fmt.Println("unable to get caller info")
+			return
+		}
 
-	http.ListenAndServe(":8080", combinedHandler(rootMux, http.FileServer(http.FS(f)).ServeHTTP))
+		srcDir := filepath.Dir(file)
+		f = os.DirFS(srcDir)
+	}
+	rootMux.Handle("/static/", http.FileServer(http.FS(f)))
+	rootMux.Handle("/", http.RedirectHandler("/app", http.StatusMovedPermanently))
+
+	http.ListenAndServe(":8080", rootMux)
 }
