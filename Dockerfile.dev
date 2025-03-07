@@ -4,12 +4,16 @@ WORKDIR /app
 # Copy go package for building
 COPY . .
 
-RUN go mod tidy && CGO_ENABLED=0 go build ./cmd/webapp
+RUN go mod tidy && CGO_ENABLED=1 go build ./cmd/webapp
 
 FROM haproxytech/haproxy-alpine:3.1
 WORKDIR /app
 
 COPY --from=gobuild /app/webapp ./
+
+# Golang dev environment
+COPY --from=gobuild /usr/local/go /usr/local/go
+ENV PATH=$PATH:/usr/local/go/bin
 
 COPY scripts/_utils.sh ./
 COPY scripts/manager.sh ./

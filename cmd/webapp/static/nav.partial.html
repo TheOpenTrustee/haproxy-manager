@@ -1,0 +1,45 @@
+{{ define "nav" }}
+<div class="navbar bg-base-100 shadow-sm">
+    <div class="flex-1">
+        <a class="btn btn-ghost text-xl">HAProxy Manager</a>
+    </div>
+    <div class="flex-none">
+        <ul class="menu menu-horizontal px-1">
+            {{ if .Flags.IsEnabled "dashboard" }}<li><a>Dashboard</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "hosts" }}<li><a>Hosts</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "access_lists" }}<li><a>Access Lists</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "ssl_certs" }}<li><a>SSL Certificates</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "users" }}<li><a>Users</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "audit_logs" }}<li><a>Audit Log</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "settings" }}<li><a>Settings</a></li>{{ end }}
+            <!-- <li>
+                <details>
+                    <summary>Parent</summary>
+                    <ul class="bg-base-100 rounded-t-none p-2">
+                        <li><a>Link 1</a></li>
+                        <li><a>Link 2</a></li>
+                    </ul>
+                </details>
+            </li> -->
+        </ul>
+        <div class="dropdown dropdown-end">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                <div class="w-10 rounded-full">
+                    <img alt="Tailwind CSS Navbar component"
+                        src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                </div>
+            </div>
+            <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                <!-- <li>
+                    <a class="justify-between">
+                        Profile
+                        <span class="badge">New</span>
+                    </a>
+                </li> -->
+                <li><a>User Settings</a></li>
+                <li><a>Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{{ end }}
