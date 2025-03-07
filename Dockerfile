@@ -1,6 +1,19 @@
-FROM haproxytech/haproxy-alpine:3.2
-
+FROM golang:1.23-alpine AS gobuild
 WORKDIR /app
+
+# Copy go package for building
+COPY . .
+
+RUN go mod tidy && go build ./cmd/test
+
+FROM haproxytech/haproxy-alpine:3.1
+WORKDIR /app
+
+COPY --from=gobuild /app/test ./
+
+COPY scripts/_utils.sh ./
+COPY scripts/manager.sh ./
+
 
 # Install dependencies
 ENV PROCFUSTION_VERSION=v0.2.2
@@ -11,7 +24,7 @@ RUN wget -O procfusion.tar.gz https://github.com/linkdd/procfusion/releases/down
 
 # haproxy dataplane settings
 ENV HAPROXY_DATAPLANE_USER=admin
-ENV HAPROXY_DATAPLANE_PASSWORD=mypassword
+ENV HAPROXY_DATAPLANE_PASS=mypassword
 ENV HAPROXY_DATAPLANE_DEFAULT_PORT=5555
 ENV HAPROXY_DATAPLANE_USERLIST=default-haproxy-dataplane
 COPY scripts/dataplane.sh ./dataplane.sh
