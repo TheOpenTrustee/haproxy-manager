@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/jaitaiwan/haproxy-manager/internal/util"
+	dpc "github.com/jaitaiwan/haproxy-manager/internal/util/dataplane-client"
 )
 
 // LoginPageHandler serves the login page.
@@ -21,62 +21,25 @@ func dashboardEndpoint(ff *util.FeatureFlags) http.HandlerFunc {
 			return
 		}
 
-		// Example data to pass to the template (replace with actual data as needed).
-		data := map[string]interface{}{
-			"Title":   "Dashboard",
-			"Content": "dash.partial.html",
-			"Flags":   ff,
-		}
-
 		// Execute the template and write the output to the response.
 		w.Header().Set("Content-Type", "text/html")
 
-		c, err := util.CreateClient()
+		frontends, e, err := dpc.GetFrontends()
 		if err != nil {
-			log.Fatalf("Error creating client: %v", err)
+			http.Error(w, "Could not get frontends", http.StatusInternalServerError)
+			return
 		}
 
-		configuration, err := c.Configuration()
-		if err != nil {
-			log.Fatalf("Error getting configuration: %v", err)
+		if e != nil {
+			log.Printf("Error: %v", e)
 		}
 
-		ru, err := c.Runtime()
-		if err != nil {
-			log.Fatalf("Error getting runtime: %v", err)
+		data := map[string]interface{}{
+			"Title":     "Dashboard",
+			"Content":   "dash.partial.html",
+			"Flags":     ff,
+			"Frontends": frontends,
 		}
-
-		tid, err := configuration.StartTransaction(3)
-		if err != nil {
-			log.Fatalf("Error starting transaction: %v", err)
-		}
-
-		processInfo, err := ru.GetInfo()
-		if err != nil {
-			log.Fatalf("Error getting process info: %v", err)
-		}
-
-		_, backends, err := configuration.GetBackends(tid.ID)
-		if err != nil {
-			log.Fatalf("Error getting backends: %v", err)
-		}
-
-		_, frontends, err := configuration.GetFrontends(tid.ID)
-		if err != nil {
-			log.Fatalf("Error getting frontends: %v", err)
-		}
-
-		err = configuration.CreateFrontend(&models., tid.ID, 1)
-		if err != nil {
-			log.Fatalf("Error creating frontend: %v", err)
-		}
-
-		_, _ = configuration.CommitTransaction(tid.ID)
-
-		fmt.Printf("%v\n", processInfo.Info)
-		fmt.Printf("%v\n", ru.GetStats())
-		fmt.Printf("%v\n", backends[0].Name)
-		fmt.Printf("%v\n", frontends)
 
 		if err := tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
 			http.Error(w, "Could not render page", http.StatusInternalServerError)

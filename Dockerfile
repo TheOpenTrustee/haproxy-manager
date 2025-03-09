@@ -4,10 +4,12 @@ WORKDIR /app
 # Copy go package for building
 COPY . .
 
-RUN go mod tidy && CGO_ENABLED=0 go build ./cmd/webapp
+RUN apk add --no-cache musl-dev gcc
+RUN go mod tidy && CGO_ENABLED=1 go build ./cmd/webapp
 
 FROM haproxytech/haproxy-alpine:3.1
 WORKDIR /app
+
 
 COPY --from=gobuild /app/webapp ./
 

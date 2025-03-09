@@ -20,13 +20,16 @@ type FeatureFlags struct {
 func NewFeatureFlags() *FeatureFlags {
 	return &FeatureFlags{
 		flags: map[string]bool{
-			"dashboard":    true,
-			"hosts":        false,
-			"access_lists": false,
-			"ssl_certs":    false,
-			"users":        false,
-			"audit_logs":   false,
-			"settings":     false,
+			"dashboard":         true,
+			"hosts":             false,
+			"access_lists":      false,
+			"ssl_certs":         false,
+			"users":             false,
+			"audit_logs":        false,
+			"settings":          false,
+			"streams":           false,
+			"404_hosts":         false,
+			"redirection_hosts": false,
 		},
 	}
 }
