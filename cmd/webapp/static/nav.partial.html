@@ -1,17 +1,26 @@
 {{ define "nav" }}
-<div class="navbar bg-base-100 shadow-sm">
+<nav class="navbar bg-base-100 shadow-sm">
     <div class="flex-1">
         <span class="text-xl pl-4">HAProxy Manager</span>
     </div>
     <div class="flex-none">
         <ul class="menu menu-horizontal px-1">
-            {{ if .Flags.IsEnabled "dashboard" }}<li><a>Dashboard</a></li>{{ end }}
-            {{ if .Flags.IsEnabled "hosts" }}<li><a>Hosts</a></li>{{ end }}
-            {{ if .Flags.IsEnabled "access_lists" }}<li><a>Access Lists</a></li>{{ end }}
-            {{ if .Flags.IsEnabled "ssl_certs" }}<li><a>SSL Certificates</a></li>{{ end }}
-            {{ if .Flags.IsEnabled "users" }}<li><a>Users</a></li>{{ end }}
-            {{ if .Flags.IsEnabled "audit_logs" }}<li><a>Audit Log</a></li>{{ end }}
-            {{ if .Flags.IsEnabled "settings" }}<li><a>Settings</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "dashboard" }}<li><a {{ if eq .Active "dashboard" }}class="active" {{end}}
+                    href="/app/dashboard">Dashboard</a>
+            </li>{{ end }}
+            {{ if .Flags.IsEnabled "hosts" }}<li><a {{ if eq .Active "hosts" }}class="active" {{end}}
+                    href="/app/hosts/">Hosts</a></li>{{
+            end }}
+            {{ if .Flags.IsEnabled "access_lists" }}<li><a {{ if eq .Active "access_lists" }}class="active"
+                    {{end}}>Access Lists</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "ssl_certs" }}<li><a {{ if eq .Active "ssl_certs" }}class="active" {{end}}>SSL
+                    Certificates</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "users" }}<li><a {{ if eq .Active "users" }}class="active" {{end}}>Users</a></li>{{
+            end }}
+            {{ if .Flags.IsEnabled "audit_logs" }}<li><a {{ if eq .Active "audit_logs" }}class="active" {{end}}>Audit
+                    Log</a></li>{{ end }}
+            {{ if .Flags.IsEnabled "settings" }}<li><a {{ if eq .Active "settings" }}class="active" {{end}}>Settings</a>
+            </li>{{ end }}
             <!-- <li>
                 <details>
                     <summary>Parent</summary>
@@ -60,5 +69,5 @@
             </svg>
         </label>
     </div>
-</div>
+</nav>
 {{ end }}

@@ -27,6 +27,7 @@ RUN wget -O procfusion.tar.gz https://github.com/linkdd/procfusion/releases/down
 # haproxy dataplane settings
 ENV HAPROXY_DATAPLANE_USER=admin
 ENV HAPROXY_DATAPLANE_PASS=mypassword
+## Above two vars are useless till https://github.com/haproxytech/dataplaneapi/issues/363 is fixed
 ENV HAPROXY_DATAPLANE_DEFAULT_PORT=5555
 ENV HAPROXY_DATAPLANE_USERLIST=default-haproxy-dataplane
 COPY scripts/dataplane.sh ./dataplane.sh

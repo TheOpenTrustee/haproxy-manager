@@ -1,51 +1,10 @@
 package main
 
 import (
-	"html/template"
 	"log"
 	"net/http"
 	"time"
-
-	"github.com/jaitaiwan/haproxy-manager/internal/util"
-	dpc "github.com/jaitaiwan/haproxy-manager/internal/util/dataplane-client"
 )
-
-// LoginPageHandler serves the login page.
-func dashboardEndpoint(ff *util.FeatureFlags) http.HandlerFunc {
-
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Parse the index.html and login.partial.html templates from the embedded filesystem.
-		tmpl, err := template.ParseFS(f, "static/index.html", "static/nav.partial.html", "static/dash.partial.html")
-		if err != nil {
-			http.Error(w, "Could not parse templates", http.StatusInternalServerError)
-			return
-		}
-
-		// Execute the template and write the output to the response.
-		w.Header().Set("Content-Type", "text/html")
-
-		frontends, e, err := dpc.GetFrontends()
-		if err != nil {
-			http.Error(w, "Could not get frontends", http.StatusInternalServerError)
-			return
-		}
-
-		if e != nil {
-			log.Printf("Error: %v", e)
-		}
-
-		data := map[string]interface{}{
-			"Title":     "Dashboard",
-			"Content":   "dash.partial.html",
-			"Flags":     ff,
-			"Frontends": frontends,
-		}
-
-		if err := tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
-			http.Error(w, "Could not render page", http.StatusInternalServerError)
-		}
-	}
-}
 
 // responseWriter is a wrapper around http.ResponseWriter that captures the status code.
 type responseWriter struct {

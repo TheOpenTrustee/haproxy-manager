@@ -1,0 +1,82 @@
+{{ define "content" }}
+{{ template "nav" . }}
+<main>
+    <div class="flex flex-row gap-4 p-4 justify-center">
+        <div class="stack">
+            <div class="card shadow-md bg-base-200 border-l-2 border-green-500">
+                <div class="card-body">
+                    <h2 class="card-title">Proxy Hosts</h2>
+                    <p>{{ len .Frontends }}</p>
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+
+        {{ if .Flags.IsEnabled "redirection_hosts" }}
+        <div class="stack">
+            <div class="card shadow-md bg-base-200 border-l-2 border-yellow-500">
+                <div class="card-body">
+                    <h2 class="card-title">Redirection Hosts</h2>
+                    <p>30</p>
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+        {{ end }}
+
+        {{ if .Flags.IsEnabled "streams" }}
+        <div class="stack">
+            <div class="card shadow-md bg-base-200 border-l-2 border-blue-500">
+                <div class="card-body">
+                    <h2 class="card-title">Streams</h2>
+                    <p>30</p>
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+        {{ end }}
+
+        {{ if .Flags.IsEnabled "404_hosts" }}
+        <div class="stack">
+            <div class="card shadow-md bg-base-200 border-l-2 border-red-500">
+                <div class="card-body">
+                    <h2 class="card-title">404 Hosts</h2>
+                    <p>30</p>
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+
+                </div>
+            </div>
+            <div class="card shadow-md bg-base-200">
+                <div class="card-body">
+
+                </div>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</main>
+{{ end }}

@@ -21,7 +21,7 @@ func NewFeatureFlags() *FeatureFlags {
 	return &FeatureFlags{
 		flags: map[string]bool{
 			"dashboard":         true,
-			"hosts":             false,
+			"hosts":             true,
 			"access_lists":      false,
 			"ssl_certs":         false,
 			"users":             false,
