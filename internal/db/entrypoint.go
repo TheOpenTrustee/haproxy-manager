@@ -2,8 +2,9 @@ package db
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
+
+	"github.com/jaitaiwan/haproxy-manager/internal/errors"
 
 	_ "github.com/mattn/go-sqlite3"
 )

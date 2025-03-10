@@ -2,10 +2,11 @@ package db
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/jaitaiwan/haproxy-manager/internal/errors"
 
 	"github.com/jaitaiwan/haproxy-manager/internal/util"
 )

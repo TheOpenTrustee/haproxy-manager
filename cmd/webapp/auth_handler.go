@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
+	"github.com/jaitaiwan/haproxy-manager/internal/errors"
 	"github.com/jaitaiwan/haproxy-manager/internal/util"
 	_ "github.com/mattn/go-sqlite3"
 )

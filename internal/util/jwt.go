@@ -1,9 +1,10 @@
 package util
 
 import (
-	"errors"
 	"strconv"
 	"time"
+
+	"github.com/jaitaiwan/haproxy-manager/internal/errors"
 
 	"github.com/golang-jwt/jwt/v5"
 )

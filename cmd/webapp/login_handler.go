@@ -86,13 +86,10 @@ func loginHandler(ff *util.FeatureFlags) http.Handler {
 		// Example data to pass to the template (replace with actual data as needed).
 		data := DefaultViewData{
 			Title: "Login Page",
+			Flags: ff,
 		}
 
 		// Execute the template and write the output to the response.
-		w.Header().Set("Content-Type", "text/html")
-
-		if err := tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
-			http.Error(w, "Could not render page", http.StatusInternalServerError)
-		}
+		WriteTemplate(w, tmpl, data)
 	})
 }

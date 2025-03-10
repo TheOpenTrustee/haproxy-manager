@@ -44,8 +44,6 @@ func dashboardEndpoint(ff *util.FeatureFlags) http.Handler {
 			Frontends: frontends,
 		}
 
-		if err := tmpl.ExecuteTemplate(w, "index.html", data); err != nil {
-			http.Error(w, "Could not render page", http.StatusInternalServerError)
-		}
+		WriteTemplate(w, tmpl, data)
 	})
 }

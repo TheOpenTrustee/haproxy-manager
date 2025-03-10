@@ -15,11 +15,14 @@
   </script>
   <script src="/assets/htmx.js"></script>
   <script src="/assets/tailwind.js"></script>
+  <style type="text/tailwindcss">
+    @custom-variant dark (:root:has(input.theme-controller[value=dark]:checked), [data-theme=dark] *);
+  </style>
   <link rel="stylesheet" href="/assets/daisyui.css" type="text/css" />
   <link href="https://cdn.jsdelivr.net/npm/daisyui@5.0.0/themes.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body class="w-full h-full bg-base-200">
+<body class="w-full h-full dark:bg-slate-900 bg-slate-200">
   {{ template "content" . }}
 </body>
 
