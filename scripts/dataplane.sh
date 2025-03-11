@@ -3,9 +3,11 @@
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/_utils.sh"
 
-wait_file "/run/haproxy.pid" && {
+if wait_file "/run/haproxy.pid"; then
   echo "HAProxy pid file found"
-}
+else
+  echo "HAProxy pid file not found after timeout"
+fi
 
 yq -i ".dataplaneapi.advertised.api_port = $HAPROXY_DATAPLANE_DEFAULT_PORT" /etc/haproxy/dataplaneapi.yaml
 
